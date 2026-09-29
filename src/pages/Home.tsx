@@ -1,15 +1,15 @@
-import { motion, useReducedMotion } from 'motion/react'
-import { useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ClinicalFooter from '../components/ora/ClinicalFooter'
+import EditorialImage, { WARM_GRADE, imageSet, imageSrc, type ImageKey } from '../components/ora/EditorialImage'
 import { OcclusionArch } from '../components/ora/OcclusionPath'
 import SmileApertureHero from '../components/ora/SmileApertureHero'
 import SmileGoal from '../components/ora/SmileGoal'
-import { APPOINTMENT_TYPES } from '../data/appointmentTypes'
 import type { Curve } from '../lib/arch'
 import { STEPS, useVisit } from '../store/visitStore'
 
-const Reveal = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => {
+const Reveal = ({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => {
   const reduce = useReducedMotion()
   return (
     <motion.div
@@ -17,7 +17,7 @@ const Reveal = ({ children, className = '' }: { children: React.ReactNode; class
       initial={reduce ? false : { opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-12% 0px' }}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ delay, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -31,100 +31,51 @@ export default function Home() {
       <Studio />
       <HowItBegins />
       <Smile />
-      <CareIndex />
+      <CareDoors />
       <ClinicalFooter />
     </>
   )
 }
 
 function Studio() {
+  const ref = useRef<HTMLElement>(null)
+  const reduce = useReducedMotion()
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
+  const drift = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [60, -60])
   return (
-    <section id="studio" className="scroll-mt-28 border-t border-bone px-4 py-28 md:px-[6%] md:py-40">
-      <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr]">
-        <Reveal>
-          <p className="label mb-6">01 — Studio</p>
-          <h2 className="display text-[clamp(2.8rem,6vw,5.8rem)]">
-            A studio,
-            <br />
-            <em className="font-light">not</em> a waiting room.
-          </h2>
-        </Reveal>
-        <Reveal className="lg:pt-16">
-          <p className="max-w-[520px] text-xl leading-relaxed text-graphite">
-            Three treatment chairs, four clinicians and a schedule built around the time each visit actually needs. No double-booking, no rushing, no guessing what to ask for.
-          </p>
-          <dl className="mt-14 grid gap-10 sm:grid-cols-3">
-            {[
-              ['Time that fits', 'Every appointment is sized to what it involves — and the chair reset is held too.'],
-              ['Heard first', 'Visits start with listening. Nothing is decided before you arrive.'],
-              ['Precise', 'Digital scanning where it helps, clear explanations everywhere.'],
-            ].map(([k, v], i) => (
-              <div key={k} className="border-t border-steel-2 pt-4">
-                <dt className="label mb-2 text-[10px]">0{i + 1}</dt>
-                <dd>
-                  <span className="block font-display text-xl">{k}</span>
-                  <span className="mt-2 block text-sm leading-relaxed text-muted">{v}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </Reveal>
-      </div>
-      <Reveal className="mt-24">
-        <ChairLanes />
-      </Reveal>
-    </section>
-  )
-}
-
-/** Quiet illustration of the studio day: three chair lanes, visits fitting their time. */
-function ChairLanes() {
-  const lanes = [
-    [
-      [0, 12],
-      [15, 30],
-      [34, 44],
-      [60, 78],
-      [82, 95],
-    ],
-    [
-      [4, 22],
-      [26, 38],
-      [48, 66],
-      [70, 80],
-    ],
-    [
-      [0, 18],
-      [30, 48],
-      [52, 60],
-      [66, 86],
-    ],
-  ]
-  return (
-    <figure aria-label="Illustration: a day across three treatment chairs">
-      <div className="space-y-3">
-        {lanes.map((blocks, i) => (
-          <div key={i} className="grid grid-cols-[88px_1fr] items-center gap-4">
-            <span className="label text-[10px]">Chair 0{i + 1}</span>
-            <div className="relative h-14 border-y border-steel-2">
-              {blocks.map(([s, e], k) => (
-                <motion.span
-                  key={k}
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 + (i * 5 + k) * 0.05, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  className="porcelain-surface absolute inset-y-1.5 origin-left"
-                  style={{ left: `${s}%`, width: `${e - s - 0.8}%` }}
-                />
+    <section ref={ref} id="studio" className="scroll-mt-28 px-4 py-24 md:px-[5%] md:py-36">
+      <div className="grid items-end gap-10 lg:grid-cols-12">
+        <EditorialImage k="treatmentChair" className="aspect-[4/3] lg:col-span-7" sizes="(min-width:1024px) 58vw, 100vw" caption="Chair 02 · treatment room" />
+        <div className="lg:col-span-5 lg:pb-6">
+          <Reveal>
+            <p className="label mb-5">01 — Studio</p>
+            <h2 className="display text-[clamp(2.6rem,5.2vw,5rem)]">
+              A studio,
+              <br />
+              <em className="font-light">not</em> a waiting room.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <dl className="mt-12 grid grid-cols-3 border-t border-steel-2">
+              {[
+                ['03', 'chairs'],
+                ['04', 'clinicians'],
+                ['0', 'double-booking'],
+              ].map(([n, l]) => (
+                <div key={l} className="pt-4">
+                  <dt className="font-display text-4xl">{n}</dt>
+                  <dd className="label mt-1 text-[10px]">{l}</dd>
+                </div>
               ))}
-              {i === 1 && <span className="absolute inset-y-0 w-px bg-clinic" style={{ left: '43%' }} aria-hidden />}
-            </div>
-          </div>
-        ))}
+            </dl>
+          </Reveal>
+        </div>
       </div>
-      <figcaption className="label mt-4 text-right text-[10px]">08:00 ——— a studio day ——— 18:00</figcaption>
-    </figure>
+      <motion.div style={{ y: drift }} className="mt-10 grid grid-cols-2 gap-4 md:ml-[42%] md:mt-[-4rem] md:w-[58%]">
+        <EditorialImage k="chairDetail" className="aspect-[4/5]" sizes="30vw" />
+        <EditorialImage k="instrumentMacro" className="mt-12 aspect-[4/5]" sizes="30vw" position="40% 50%" />
+      </motion.div>
+    </section>
   )
 }
 
@@ -134,68 +85,74 @@ const HOW_ARCH: Curve = [
   [504, 30],
   [520, 250],
 ]
-const STEP_TEXT = [
-  'Tell us what brings you in — in your words, not medical ones.',
-  'A few short questions, only the ones that change your booking.',
-  'ORA chooses the right starting appointment and explains why.',
-  'You see real times where a suitable clinician and chair are free.',
-  'Confirm in seconds. Your CarePass and preparation arrive with it.',
-]
+const STEP_LINE = ['In your own words', 'Only what matters', 'The right visit', 'A real free chair', 'Confirmed']
 
 function HowItBegins() {
+  const reduce = useReducedMotion()
   const [step, setStep] = useState(0)
+  const [auto, setAuto] = useState(true)
+  const ref = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.4 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  useEffect(() => {
+    if (!auto || !inView || reduce) return
+    const t = window.setInterval(() => setStep((s) => (s + 1) % 5), 1700)
+    return () => window.clearInterval(t)
+  }, [auto, inView, reduce])
+
   return (
-    <section id="visit" className="scroll-mt-28 bg-ivory px-4 py-28 md:px-[6%] md:py-40">
-      <Reveal>
-        <p className="label mb-6">02 — Visit</p>
-        <h2 className="display max-w-[900px] text-[clamp(2.8rem,6vw,5.8rem)]">From “one tooth hurts” to a confirmed visit.</h2>
+    <section id="visit" className="scroll-mt-28 bg-ivory px-4 py-24 md:px-[5%] md:py-36">
+      <Reveal className="mb-16 md:mb-20">
+        <p className="label mb-5">02 — Visit</p>
+        <h2 className="display max-w-[860px] text-[clamp(2.6rem,5.2vw,5rem)]">One message in. One visit out.</h2>
       </Reveal>
-      <div className="mt-20 grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
+      <div ref={ref} className="grid items-center gap-14 lg:grid-cols-[0.8fr_1.2fr]">
         <Reveal>
-          <p className="label mb-5 text-alert">Before</p>
-          <ol className="space-y-3 font-mono text-[13px]">
-            {[
-              ['09:02', 'hi. can I book? one tooth hurts'],
-              ['09:40', 'Hello! Which tooth, and for how long?'],
-              ['10:15', 'bottom left. few days'],
-              ['10:16', 'ok. what days work for you?'],
-              ['11:52', 'is thursday free?'],
-              ['12:30', 'Thursday is full. Friday 3pm?'],
-              ['14:05', '…'],
-            ].map(([t, m], i) => (
-              <li key={i} className={`flex gap-4 ${i % 2 ? 'text-muted' : ''}`}>
-                <span className="w-12 shrink-0 text-steel">{t}</span>
-                <span>{m}</span>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-8 border-t border-bone pt-4 text-sm text-muted">7 messages, 5 hours, and still no visit — plus a receptionist pulled away from the patients in front of them.</p>
+          <div className="relative max-w-[380px]">
+            <p className="label mb-4 text-[10px]">09:02 · WhatsApp</p>
+            <p className="rounded-[22px] rounded-bl-md bg-porcelain px-6 py-5 font-mono text-[15px] leading-relaxed shadow-[0_20px_40px_-28px_rgba(0,0,0,0.4)]">
+              hi 👋 one tooth hurts.
+              <br />
+              can I come in this week?
+            </p>
+            <p className="mt-6 text-sm text-muted">Usually that starts hours of back-and-forth. At ORA it starts here →</p>
+          </div>
         </Reveal>
-        <Reveal>
-          <p className="label mb-5 text-clinic">After</p>
-          <div className="grid items-center gap-8 md:grid-cols-[1fr_1fr]">
+        <Reveal delay={0.1}>
+          <div onMouseEnter={() => setAuto(false)} className="relative">
             <svg viewBox="0 0 600 290" className="w-full" aria-hidden>
               <OcclusionArch step={step} curve={HOW_ARCH} labelSize={26} labels={false} />
             </svg>
-            <ol>
-              {STEPS.map((s, i) => (
-                <li key={s}>
-                  <button
-                    onMouseEnter={() => setStep(i)}
-                    onFocus={() => setStep(i)}
-                    onClick={() => setStep(i)}
-                    aria-pressed={step === i}
-                    className={`w-full border-b border-bone py-3 text-left transition-colors ${step === i ? 'text-charcoal' : 'text-muted'}`}
-                  >
-                    <span className="label mr-3 text-[10px]">0{i + 1}</span>
-                    <span className="font-display text-lg">{s}</span>
-                    {step === i && <span className="mt-1 block text-sm leading-relaxed text-graphite">{STEP_TEXT[i]}</span>}
-                  </button>
-                </li>
-              ))}
-            </ol>
+            <div className="absolute inset-x-0 bottom-[6%] text-center" aria-live="polite">
+              <AnimatePresence mode="wait">
+                <motion.div key={step} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
+                  <p className="label text-[10px]">
+                    0{step + 1} · {STEPS[step]}
+                  </p>
+                  <p className="mt-1 font-display text-[clamp(1.6rem,3vw,2.4rem)]">{STEP_LINE[step]}</p>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
-          <p className="mt-8 border-t border-bone pt-4 text-sm text-graphite">About three minutes. Reception only steps in when something genuinely needs a person.</p>
+          <div className="mt-8 flex justify-center gap-2" role="tablist" aria-label="Booking steps">
+            {STEPS.map((s, i) => (
+              <button
+                key={s}
+                role="tab"
+                aria-selected={step === i}
+                aria-label={s}
+                onClick={() => (setAuto(false), setStep(i))}
+                className={`h-[3px] w-8 transition-colors ${step === i ? 'bg-clinic' : 'bg-steel-2 hover:bg-steel'}`}
+              />
+            ))}
+          </div>
         </Reveal>
       </div>
     </section>
@@ -207,17 +164,32 @@ function Smile() {
   const chooseConcern = useVisit((s) => s.chooseConcern)
   const answer = useVisit((s) => s.answer)
   const reset = useVisit((s) => s.reset)
+  const ref = useRef<HTMLElement>(null)
+  const reduce = useReducedMotion()
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
+  const y = useTransform(scrollYProgress, [0, 1], reduce ? ['0%', '0%'] : ['-8%', '8%'])
   return (
-    <section id="smile" className="scroll-mt-28 px-4 py-28 md:px-[6%] md:py-40">
-      <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
-        <Reveal>
-          <p className="label mb-6">03 — Smile</p>
-          <h2 className="display text-[clamp(2.8rem,6vw,5.8rem)]">Start with the conversation.</h2>
-          <p className="mt-8 max-w-[440px] text-lg leading-relaxed text-graphite">
-            Colour, alignment, shape or a gap — choose what you'd like to talk about. A consultation is a conversation, never a commitment.
-          </p>
-        </Reveal>
-        <Reveal className="lg:pt-24">
+    <section ref={ref} id="smile" className="relative scroll-mt-20 overflow-hidden">
+      <div className="relative h-[78svh] min-h-[520px]">
+        <motion.img
+          src={imageSrc('smile')}
+          srcSet={imageSet('smile')}
+          sizes="100vw"
+          alt="A woman laughing with a natural, relaxed smile"
+          loading="lazy"
+          className="absolute inset-0 h-[116%] w-full object-cover"
+          style={{ y, top: '-8%', filter: WARM_GRADE, objectPosition: '32% 30%' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/55 via-charcoal/10 to-transparent" />
+        <div className="relative z-10 flex h-full flex-col justify-end px-4 pb-16 md:px-[5%] md:pb-24">
+          <Reveal>
+            <p className="label mb-4 !text-ivory/80">03 — Smile</p>
+            <h2 className="display max-w-[640px] text-[clamp(2.6rem,5.6vw,5.4rem)] text-ivory">Start with the conversation.</h2>
+          </Reveal>
+        </div>
+      </div>
+      <div className="relative z-10 -mt-10 px-4 pb-24 md:px-[5%]">
+        <div className="mx-auto max-w-[900px] bg-porcelain px-4 pt-2 md:px-8">
           <SmileGoal
             onChange={(g) => {
               reset()
@@ -226,35 +198,58 @@ function Smile() {
               navigate('/visit')
             }}
           />
-          <p className="label mt-4 text-[10px]">Choose a shade tab to begin a smile visit</p>
-        </Reveal>
+        </div>
+        <p className="label mt-4 text-center text-[10px]">Pick a shade tab to begin</p>
       </div>
     </section>
   )
 }
 
-function CareIndex() {
+const DOORS: { k: ImageKey; title: string; visits: string[]; position?: string }[] = [
+  { k: 'chairDetail', title: 'When something hurts', visits: ['Comfort & Assessment', 'Restorative Review', 'Gum Care Review'] },
+  { k: 'smile2', title: 'Your smile', visits: ['Smile Consultation', 'Whitening', 'Alignment'], position: '50% 25%' },
+  { k: 'model', title: 'Keeping well', visits: ['Check-up & Hygiene', 'New Patient Exam', "Children's Visit"] },
+]
+
+function CareDoors() {
   return (
-    <section className="border-t border-bone px-4 py-28 md:px-[6%]">
+    <section className="px-4 py-24 md:px-[5%] md:py-32">
       <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
         <Reveal>
-          <p className="label mb-6">04 — Care</p>
-          <h2 className="display text-[clamp(2.4rem,4.5vw,4.2rem)]">Nine ways to begin.</h2>
+          <p className="label mb-5">04 — Care</p>
+          <h2 className="display text-[clamp(2.4rem,4.6vw,4.2rem)]">Nine ways to begin.</h2>
         </Reveal>
         <Link to="/care" className="btn-quiet">
-          The full care index →
+          All care →
         </Link>
       </div>
-      <ol className="border-t border-steel-2">
-        {APPOINTMENT_TYPES.map((t, i) => (
-          <li key={t.id} className="grid grid-cols-[40px_1fr_auto] items-baseline gap-4 border-b border-bone py-4 md:grid-cols-[60px_1fr_1.2fr_auto]">
-            <span className="label text-[10px]">{String(i + 1).padStart(2, '0')}</span>
-            <span className="font-display text-xl md:text-2xl">{t.name}</span>
-            <span className="hidden text-sm text-muted md:block">{t.summary}</span>
-            <span className="font-mono text-sm">{t.duration_minutes}′</span>
-          </li>
+      <div className="grid gap-4 md:grid-cols-3">
+        {DOORS.map((d, i) => (
+          <Reveal key={d.title} delay={i * 0.08}>
+            <Link to="/care" className="group relative block aspect-[3/4] overflow-hidden">
+              <img
+                src={imageSrc(d.k)}
+                srcSet={imageSet(d.k)}
+                sizes="(min-width:768px) 33vw, 100vw"
+                alt=""
+                loading="lazy"
+                className="size-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                style={{ filter: WARM_GRADE, objectPosition: d.position }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-charcoal/5 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-ivory">
+                <p className="label mb-2 !text-ivory/70">0{i + 1}</p>
+                <p className="font-display text-3xl">{d.title}</p>
+                <ul className="mt-3 max-h-0 overflow-hidden text-sm text-ivory/85 opacity-0 transition-all duration-500 group-hover:max-h-24 group-hover:opacity-100 group-focus-visible:max-h-24 group-focus-visible:opacity-100">
+                  {d.visits.map((v) => (
+                    <li key={v}>{v}</li>
+                  ))}
+                </ul>
+              </div>
+            </Link>
+          </Reveal>
         ))}
-      </ol>
+      </div>
     </section>
   )
 }

@@ -3,14 +3,18 @@ import { Suspense, lazy, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import DentalArchNav from './components/ora/DentalArchNav'
 import SterileTransition from './motion/SterileTransition'
+import StudioIntro from './motion/StudioIntro'
 import Care from './pages/Care'
 import Home from './pages/Home'
 import Manage from './pages/Manage'
 import Visit from './pages/Visit'
 
 // Staff tools are split out so patients never download them.
-const Staff = lazy(() => import('./pages/Staff'))
-const StaffLogin = lazy(() => import('./pages/StaffLogin'))
+const StaffShell = lazy(() => import('./staff/StaffShell'))
+const Today = lazy(() => import('./pages/staff/Today'))
+const Bookings = lazy(() => import('./pages/staff/Bookings'))
+const Patients = lazy(() => import('./pages/staff/Patients'))
+const Activity = lazy(() => import('./pages/staff/Activity'))
 
 function ScrollManager() {
   const { pathname, hash } = useLocation()
@@ -36,10 +40,11 @@ function Shell() {
       </a>
       {!staff && <DentalArchNav />}
       <SterileTransition />
+      <StudioIntro />
       <AnimatePresence mode="wait">
         <motion.main
           id="main"
-          key={location.pathname.split('/')[1] + (location.pathname.startsWith('/staff/login') ? '-login' : '')}
+          key={location.pathname.split('/')[1]}
           initial={{ opacity: reduce ? 1 : 0 }}
           animate={{ opacity: 1, transition: { duration: 0.35, delay: reduce ? 0 : 0.28 } }}
           exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.22 } }}
@@ -51,8 +56,13 @@ function Shell() {
             <Route path="/visit" element={<Visit />} />
             <Route path="/manage" element={<Manage />} />
             <Route path="/manage/:bookingCode" element={<Manage />} />
-            <Route path="/staff/login" element={<StaffLogin />} />
-            <Route path="/staff" element={<Staff />} />
+            <Route path="/staff/login" element={<Navigate to="/staff" replace />} />
+            <Route path="/staff" element={<StaffShell />}>
+              <Route index element={<Today />} />
+              <Route path="bookings" element={<Bookings />} />
+              <Route path="patients" element={<Patients />} />
+              <Route path="activity" element={<Activity />} />
+            </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </Suspense>

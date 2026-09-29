@@ -3,6 +3,7 @@ import { CLINICIANS, chairById, clinicianById } from '../data/clinic'
 import { bookingCode, uid } from './db/ids'
 import { read, resetDemo as resetStore, write } from './db/store'
 import { canPlace, findSlots, type FindOptions, type Snapshot } from './scheduling/availability'
+import { currentStaff } from './auth'
 import { addMinutesIso, formatIsoTime, nowIso, relativeDay, toWall } from './time'
 import type {
   Appointment,
@@ -11,6 +12,7 @@ import type {
   ConcernId,
   EventStatus,
   EventType,
+  IntakeResponse,
   Patient,
   Slot,
 } from './types'
@@ -51,9 +53,13 @@ function addEvent(
   event_type: EventType,
   label: string,
   status: EventStatus,
-  extra: Partial<Pick<AppointmentEvent, 'scheduled_for' | 'completed_at' | 'metadata'>> = {},
+  extra: Partial<Pick<AppointmentEvent, 'scheduled_for' | 'completed_at' | 'metadata'>> & { actor?: string } = {},
 ): AppointmentEvent {
   const now = nowIso()
+  // Who did it: the signed-in staff member, the patient, or ORA itself.
+  const actor =
+    extra.actor ??
+    (status === 'simulated' || event_type === 'reminder_scheduled' || event_type === 'prep_shared' ? 'ORA' : currentStaff()?.name ?? 'Patient')
   return {
     id: uid('evt'),
     appointment_id,
@@ -62,7 +68,7 @@ function addEvent(
     status,
     scheduled_for: extra.scheduled_for ?? null,
     completed_at: extra.completed_at ?? (status === 'done' || status === 'simulated' ? now : null),
-    metadata: extra.metadata ?? {},
+    metadata: { ...extra.metadata, actor },
     created_at: now,
     is_demo: true,
   }
@@ -96,6 +102,9 @@ export interface BookingInput {
   typeSlug: string
   slot: Slot
   patient: { full_name: string; phone: string; email: string }
+  /** Book for a patient already on file (reception). */
+  patientId?: string
+  source?: 'online' | 'reception'
   intake: { routing_category: ConcernId; responses: Record<string, unknown>; complete: boolean }
 }
 
@@ -112,7 +121,10 @@ export const createBooking = (input: BookingInput) =>
     if (!placement.ok) throw new ApiError('conflict', 'That time was just taken. Here are the nearest alternatives.')
 
     const now = nowIso()
-    const patient: Patient = {
+    const source = input.source ?? 'online'
+    const existing = input.patientId ? read().patients.find((p) => p.id === input.patientId) : undefined
+    const who = source === 'online' ? 'Patient' : currentStaff()?.name ?? 'Reception'
+    const patient: Patient = existing ?? {
       id: uid('pat'),
       full_name: input.patient.full_name.trim(),
       phone: input.patient.phone.trim(),
@@ -131,15 +143,21 @@ export const createBooking = (input: BookingInput) =>
       end_at: input.slot.end_at,
       status: 'booked',
       is_demo: true,
-      source: 'online',
+      source,
       reschedule_requested: false,
       created_at: now,
       updated_at: now,
     }
     const remindAt = addMinutesIso(appointment.start_at, -24 * 60)
     const events = [
-      addEvent(appointment.id, 'intake_received', `Intake received · ${input.intake.routing_category} route`, 'done'),
-      addEvent(appointment.id, 'booking_confirmed', `Visit confirmed · ${chairById(appointment.chair_id)?.name}`, 'done'),
+      addEvent(
+        appointment.id,
+        'intake_received',
+        source === 'online' ? `Intake received · ${input.intake.routing_category} route` : 'Booked by reception',
+        'done',
+        { actor: who },
+      ),
+      addEvent(appointment.id, 'booking_confirmed', `Visit confirmed · ${chairById(appointment.chair_id)?.name}`, 'done', { actor: who }),
       addEvent(appointment.id, 'confirmation_prepared', `Confirmation prepared for ${patient.phone}`, 'simulated'),
       addEvent(appointment.id, 'prep_shared', 'Pre-visit guidance attached to CarePass', 'done'),
       addEvent(
@@ -154,7 +172,7 @@ export const createBooking = (input: BookingInput) =>
       events.push(addEvent(appointment.id, 'intake_incomplete', 'Optional intake details skipped', 'attention'))
 
     write((db) => {
-      db.patients.push(patient)
+      if (!existing) db.patients.push(patient)
       db.appointments.push(appointment)
       db.intake_responses.push({
         id: uid('int'),
@@ -188,7 +206,7 @@ const detail = (code: string): BookingDetail => {
 
 export const getBooking = (code: string) => call(() => detail(code))
 
-export const rescheduleBooking = (code: string, slot: Slot) =>
+export const rescheduleBooking = (code: string, slot: Slot, by: 'patient' | 'reception' = 'patient') =>
   call(() => {
     const { appointment } = detail(code)
     const type = typeById(appointment.appointment_type_id)!
@@ -222,14 +240,17 @@ export const rescheduleBooking = (code: string, slot: Slot) =>
         if (e.event_type === 'reschedule_requested' && e.status === 'attention') e.status = 'done'
       }
       db.appointment_events.push(
-        addEvent(a.id, 'rescheduled', `Rescheduled by patient · ${from} → ${to}`, 'done', { metadata: { from, to } }),
+        addEvent(a.id, 'rescheduled', `Rescheduled by ${by} · ${from} → ${to}`, 'done', {
+          metadata: { from, to },
+          actor: by === 'patient' ? 'Patient' : undefined,
+        }),
         addEvent(a.id, 'confirmation_prepared', 'Updated confirmation prepared', 'simulated'),
       )
     })
     return detail(code)
   }, 600)
 
-export const cancelBooking = (code: string) =>
+export const cancelBooking = (code: string, by: 'patient' | 'reception' = 'patient') =>
   call(() => {
     const { appointment } = detail(code)
     write((db) => {
@@ -238,7 +259,9 @@ export const cancelBooking = (code: string) =>
       a.updated_at = nowIso()
       for (const e of db.appointment_events)
         if (e.appointment_id === a.id && e.status === 'scheduled') e.status = 'done'
-      db.appointment_events.push(addEvent(a.id, 'cancelled', 'Cancelled by patient · chair time released', 'done'))
+      db.appointment_events.push(
+        addEvent(a.id, 'cancelled', `Cancelled by ${by} · chair time released`, 'done', { actor: by === 'patient' ? 'Patient' : undefined }),
+      )
     })
     return detail(code)
   })
@@ -251,6 +274,7 @@ export interface StaffView {
   events: AppointmentEvent[]
   timeOff: Snapshot['timeOff']
   incompleteIntake: Set<string>
+  intake: Map<string, IntakeResponse>
 }
 
 export const getStaffView = () =>
@@ -262,6 +286,7 @@ export const getStaffView = () =>
       events: db.appointment_events,
       timeOff: db.time_off,
       incompleteIntake: new Set(db.intake_responses.filter((r) => !r.complete).map((r) => r.appointment_id)),
+      intake: new Map(db.intake_responses.map((r) => [r.appointment_id, r])),
     } satisfies StaffView
   }, 200)
 
@@ -346,5 +371,18 @@ export const resolveEvent = (eventId: string) =>
       if (e) e.status = 'done'
     })
   }, 150)
+
+/** Prepares reminder messages for the selected visits (simulated delivery). */
+export const sendReminders = (ids: string[]) =>
+  call(() => {
+    write((db) => {
+      for (const id of ids) {
+        const a = db.appointments.find((x) => x.id === id)
+        if (!a || a.status === 'cancelled') continue
+        db.appointment_events.push(addEvent(id, 'confirmation_prepared', `Reminder prepared for ${formatIsoTime(a.start_at)} visit`, 'simulated'))
+      }
+    })
+    return ids.length
+  }, 300)
 
 export const resetDemo = () => call(() => resetStore(), 500)

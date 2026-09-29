@@ -206,9 +206,14 @@ function DesktopArch({ booking, settled, d, labelsOpacity, dot, hover, setHover,
           </button>
         </div>
       ) : (
-        <Link to="/visit" className="btn-primary absolute right-[3.3%] top-[33%] -translate-y-1/2 !py-3">
-          Book <span aria-hidden>↗</span>
-        </Link>
+        <div className="absolute right-[3.3%] top-[33%] flex -translate-y-1/2 items-center gap-6">
+          <Link to="/staff" className="btn-quiet hidden lg:inline-flex" title="Staff sign-in">
+            Studio login
+          </Link>
+          <Link to="/visit" className="btn-primary !py-3">
+            Book <span aria-hidden>↗</span>
+          </Link>
+        </div>
       )}
     </nav>
   )
@@ -321,7 +326,7 @@ function MobileHeader({ booking }: { booking: boolean }) {
             style={{ borderBottomLeftRadius: '50% 18%', borderBottomRightRadius: '50% 18%' }}
           >
             <ul className="px-6">
-              {[{ label: 'Home', to: '/' }, ...ITEMS.map((i) => ({ label: i.label, to: i.to })), { label: 'Manage a visit', to: '/manage' }].map(
+              {[{ label: 'Home', to: '/' }, ...ITEMS.map((i) => ({ label: i.label, to: i.to })), { label: 'Manage a visit', to: '/manage' }, { label: 'Studio login', to: '/staff' }].map(
                 (it, i, all) => {
                   // Items step along an arch: the middle of the list sits furthest out.
                   const offset = Math.sin((i / (all.length - 1)) * Math.PI) * 36

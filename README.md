@@ -19,25 +19,34 @@ npm run lint
 
 | Route | What it is |
 | --- | --- |
-| `/` | Editorial landing — SmileApertureHero, studio, visit story, smile goals |
+| `/` | Studio intro, photographic smile-aperture hero, studio, visit story, smile goals, care |
 | `/visit` | Booking flow: OralCompass → ConcernLens → UrgencyGate → CareMatch → ChairFlow → IntakeFold → CarePass |
 | `/manage/:bookingCode` | CarePass, preparation, self-service reschedule and cancel |
 | `/care` | Care index built from the appointment configuration |
-| `/staff/login` | IdentityImpression staff sign-in |
-| `/staff` | ClinicPulse, ChairMap, PatientApproach, ReceptionCommand, AutomationTrace |
+| `/staff` | Studio workspace — Today (ClinicPulse, ChairMap, PatientApproach, ReceptionCommand) |
+| `/staff/bookings` | Bookings ledger — search, filter tokens, saved views, bulk actions, CSV export |
+| `/staff/patients` | Patient directory and visit history |
+| `/staff/activity` | Activity stream and audit timeline |
 
-## Demo access
+## Studio access
 
-Staff accounts (passphrase `porcelain`):
+The staff workspace is never a separate login page. Signed out, the real studio
+stays in view but dormant — structure visible, patient names, phones and codes
+redacted — and wakes in layers: identity wakes navigation, the passphrase wakes
+the data, the second factor wakes controls and removes redaction. After 10
+minutes idle, or via **Lock studio**, it goes dormant in place and resumes
+exactly where it was with the passphrase alone.
 
-- `frontdesk@ora.studio` — Front desk
-- `manager@ora.studio` — Practice manager
-- `dr.okafor@ora.studio` — Clinician
+Demo accounts (passphrase `porcelain`, authenticator code `240118`):
 
-The login screen offers one-tap demo access. The staff menu (top right) has
-**Reset demo data** — it removes every record created through the demo and
-restores the seed schedule — and **Simulate backend outage**, to show the
-honest error and retry states.
+- `frontdesk@ora.studio` — Front desk (demo reset needs approval)
+- `manager@ora.studio` — Practice manager (full access)
+- `dr.okafor@ora.studio` — Clinician (view and status only)
+
+Controls stay visible for every role and explain themselves when read-only or
+approval-bound. The account menu has **Reset demo data** and **Simulate backend
+outage** (shows the live status layer and honest retry states). Press
+`Ctrl/⌘ K` anywhere in the studio for the command palette — try “next whitening”.
 
 ## How it works
 
