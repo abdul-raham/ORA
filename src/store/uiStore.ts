@@ -1,14 +1,14 @@
 import { create } from 'zustand'
 
-// Whether the first-visit studio intro is still playing. The hero holds its
-// own entrance until the intro hands over.
+// Whether the studio intro is still playing. It plays on every full load of
+// the home page (including refresh), but not when navigating within the site
+// or when the visitor prefers reduced motion. The hero holds its own entrance
+// until the intro hands over.
 
-const played = () => {
-  try {
-    return sessionStorage.getItem('ora.intro') === '1'
-  } catch {
-    return true
-  }
+const skipIntro = () => {
+  if (typeof window === 'undefined') return true
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return true
+  return window.location.pathname !== '/'
 }
 
 interface UiState {
@@ -17,13 +17,6 @@ interface UiState {
 }
 
 export const useUi = create<UiState>()((set) => ({
-  introDone: played() || (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
-  finishIntro: () => {
-    try {
-      sessionStorage.setItem('ora.intro', '1')
-    } catch {
-      // Replays next time; harmless.
-    }
-    set({ introDone: true })
-  },
+  introDone: skipIntro(),
+  finishIntro: () => set({ introDone: true }),
 }))
