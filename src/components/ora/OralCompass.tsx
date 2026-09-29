@@ -30,7 +30,7 @@ export default function OralCompass({ value, onChoose }: { value: ConcernId | nu
   return (
     <div>
       {/* Instrument (tablet and up) */}
-      <div className="relative mx-auto hidden aspect-[600/340] w-full max-w-[760px] md:block">
+      <div className="relative mx-auto hidden aspect-[600/340] w-full max-w-[760px] lg:block">
         <svg viewBox="0 0 600 340" className="absolute inset-0 size-full" aria-hidden>
           {[0, 1, 2].map((i) => (
             <path
@@ -106,7 +106,7 @@ export default function OralCompass({ value, onChoose }: { value: ConcernId | nu
       </div>
 
       {/* Stacked bearings (phones) */}
-      <ul className="space-y-0 md:hidden">
+      <ul className="space-y-0 lg:hidden">
         {CONCERNS.map((c, i) => (
           <li key={c.id} className="border-b border-bone first:border-t">
             <button

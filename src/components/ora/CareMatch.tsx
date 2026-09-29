@@ -1,5 +1,6 @@
 import { typeBySlug } from '../../data/appointmentTypes'
 import ScanResolve from '../../motion/ScanResolve'
+import EditorialImage from './EditorialImage'
 import ClinicianMatch from './ClinicianMatch'
 import VisitDuration from './VisitDuration'
 
@@ -55,6 +56,12 @@ export default function CareMatch({
       </div>
 
       <aside className="space-y-12 lg:pt-10">
+        <EditorialImage
+          k={type.resource_type === 'scanner' ? 'instrumentsArm' : 'chairDetail'}
+          className="aspect-[16/9]"
+          sizes="(min-width:1024px) 40vw, 100vw"
+          caption={type.resource_type === 'scanner' ? 'Scanner chair · where your visit happens' : 'Treatment chair · where your visit happens'}
+        />
         <VisitDuration type={type} />
         <ClinicianMatch type={type} />
         {type.deposit_ngn && (

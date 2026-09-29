@@ -1,15 +1,14 @@
 import { Link } from 'react-router-dom'
 import { CLINIC } from '../../data/clinic'
+import ScrollWords from '../../motion/ScrollWords'
 
 export default function ClinicalFooter() {
   return (
     <footer className="relative mt-24 border-t border-bone bg-ivory px-4 pb-10 pt-16 md:px-[6%]">
       <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
-          <p className="display text-[clamp(2.5rem,5vw,4.5rem)] uppercase">
-            When you're
-            <br />
-            ready<span className="text-clinic">.</span>
+          <p className="display max-w-[420px] text-[clamp(2.5rem,5vw,4.5rem)] uppercase">
+            <ScrollWords text="When you're ready." />
           </p>
           <Link to="/visit" className="btn-primary mt-8">
             Begin your visit <span aria-hidden>→</span>

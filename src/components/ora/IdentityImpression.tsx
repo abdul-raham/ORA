@@ -143,7 +143,7 @@ export default function IdentityImpression({
           animate={stage === 3 && !reduce ? { opacity: 0, scale: 0.94, filter: 'blur(6px)' } : { opacity: 1, scale: 1, filter: 'blur(0px)' }}
           transition={{ delay: stage === 3 ? 0.7 : 0, duration: 0.7, ease: [0.65, 0, 0.35, 1] }}
         >
-          <svg viewBox="0 0 700 540" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 size-full" aria-hidden>
+          <svg viewBox="0 0 700 540" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 -bottom-28 top-0 h-[calc(100%+7rem)] w-full" aria-hidden>
             {Array.from({ length: CONTOURS }, (_, k) => {
               const mid = k === Math.floor(CONTOURS / 2)
               const len = Math.max(0, Math.min(1, target * (1 + (k % 4) * 0.08) - (k % 3) * 0.04))
@@ -154,7 +154,7 @@ export default function IdentityImpression({
                   fill="none"
                   stroke={error ? 'var(--color-alert)' : stage === 3 ? 'var(--color-clinic)' : mid ? 'var(--color-charcoal)' : 'var(--color-steel)'}
                   strokeWidth={mid ? 1.2 : 0.7}
-                  strokeOpacity={mid ? 0.9 : 0.55}
+                  strokeOpacity={mid ? 0.8 : 0.35}
                   vectorEffect="non-scaling-stroke"
                   initial={{ pathLength: 0, pathOffset: 0.5 }}
                   animate={{ pathLength: len, pathOffset: (1 - len) / 2 }}

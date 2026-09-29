@@ -7,14 +7,14 @@ render time; the files themselves are unedited apart from resizing.
 
 | File | Source | Creator | Licence | Usage |
 | --- | --- | --- | --- | --- |
-| `treatment-room-above.webp` | https://stocksnap.io/photo/chair-dentist-E4SV0WQ539 | Daniel Frank | CC0 | Hero — the room seen through the smile aperture |
-| `treatment-chair.webp` | https://stocksnap.io/photo/chair-dentist-3J10QN5PTS | Daniel Frank | CC0 | Home · Studio |
-| `instruments-arm.webp` | https://stocksnap.io/photo/chair-dentist-N79O15BH30 | Daniel Frank | CC0 | Reserved |
-| `chair-detail.webp` | https://www.rawpixel.com/image/5927111 | rawpixel (public domain) | CC0 | Home · Studio, Care door |
+| `treatment-room-above.webp` | https://stocksnap.io/photo/chair-dentist-E4SV0WQ539 | Daniel Frank | CC0 | Hero aperture, Manage lookup |
+| `treatment-chair.webp` | https://stocksnap.io/photo/chair-dentist-3J10QN5PTS | Daniel Frank | CC0 | Home · Studio, booking confirmation |
+| `instruments-arm.webp` | https://stocksnap.io/photo/chair-dentist-N79O15BH30 | Daniel Frank | CC0 | Care match (scanner visits) |
+| `chair-detail.webp` | https://www.rawpixel.com/image/5927111 | rawpixel (public domain) | CC0 | Home · Studio, Care, Care match |
 | `instrument-macro.webp` | https://www.rawpixel.com/image/5917413 | rawpixel (public domain) | CC0 | Home · Studio |
-| `dental-model.webp` | https://www.rawpixel.com/image/6065474 | rawpixel (public domain) | CC0 | Home · Care door |
+| `dental-model.webp` | https://www.rawpixel.com/image/6065474 | rawpixel (public domain) | CC0 | Home · Care door, Care |
 | `smile-portrait.webp` | https://stocksnap.io/photo/smiling-woman-W6GFOSFAXA | Matt Moloney | CC0 | Home · Smile |
-| `smile-portrait-2.webp` | https://stocksnap.io/photo/smiling-woman-VTHPEAGBVR | Matt Moloney | CC0 | Home · Care door |
+| `smile-portrait-2.webp` | https://stocksnap.io/photo/smiling-woman-VTHPEAGBVR | Matt Moloney | CC0 | Home · Care door, Care |
 
 Found via Openverse (https://openverse.org) with the CC0 licence filter.
 

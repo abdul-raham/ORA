@@ -5,6 +5,7 @@ import AutomationTrace from '../components/ora/AutomationTrace'
 import CarePass from '../components/ora/CarePass'
 import { ErrorState } from '../components/ora/ChairFlow'
 import ClinicalFooter from '../components/ora/ClinicalFooter'
+import EditorialImage from '../components/ora/EditorialImage'
 import PrepProtocol from '../components/ora/PrepProtocol'
 import VisitRescheduler from '../components/ora/VisitRescheduler'
 import { CLINIC } from '../data/clinic'
@@ -42,6 +43,7 @@ function Lookup() {
     }
   }
   return (
+    <div className="grid items-center gap-12 lg:grid-cols-[1fr_0.9fr]">
     <div className="max-w-[640px]">
       <p className="label mb-4">Manage a visit</p>
       <h1 className="display text-[clamp(2.8rem,6vw,5.4rem)]">Find your CarePass.</h1>
@@ -67,6 +69,8 @@ function Lookup() {
           {error}
         </p>
       )}
+    </div>
+      <EditorialImage k="treatmentRoom" className="aspect-[4/3] lg:aspect-[4/5]" sizes="(min-width:1024px) 45vw, 100vw" eager position="55% 50%" />
     </div>
   )
 }

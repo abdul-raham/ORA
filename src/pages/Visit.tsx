@@ -7,6 +7,7 @@ import CarePass from '../components/ora/CarePass'
 import ChairFlow, { ErrorState } from '../components/ora/ChairFlow'
 import ConcernLens from '../components/ora/ConcernLens'
 import DepositConfirm from '../components/ora/DepositConfirm'
+import EditorialImage from '../components/ora/EditorialImage'
 import IntakeFold, { intakeComplete, intakeReady } from '../components/ora/IntakeFold'
 import OcclusionPath from '../components/ora/OcclusionPath'
 import OralCompass from '../components/ora/OralCompass'
@@ -258,6 +259,7 @@ function Confirmed({ code }: { code: string }) {
               </Link>
             </div>
           </div>
+          <EditorialImage k="treatmentChair" className="aspect-[16/7]" sizes="(min-width:1024px) 55vw, 100vw" caption="Your chair is ready" />
           {detail && <AutomationTrace events={detail.events} title="What ORA handled for you" />}
           {detail && <PrepProtocol typeId={detail.appointment.appointment_type_id} />}
         </motion.div>

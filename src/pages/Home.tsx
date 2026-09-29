@@ -1,5 +1,5 @@
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
-import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'motion/react'
+import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ClinicalFooter from '../components/ora/ClinicalFooter'
 import EditorialImage, { WARM_GRADE, imageSet, imageSrc, type ImageKey } from '../components/ora/EditorialImage'
@@ -7,6 +7,7 @@ import { OcclusionArch } from '../components/ora/OcclusionPath'
 import SmileApertureHero from '../components/ora/SmileApertureHero'
 import SmileGoal from '../components/ora/SmileGoal'
 import type { Curve } from '../lib/arch'
+import ScrollWords from '../motion/ScrollWords'
 import { STEPS, useVisit } from '../store/visitStore'
 
 const Reveal = ({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => {
@@ -50,9 +51,7 @@ function Studio() {
           <Reveal>
             <p className="label mb-5">01 — Studio</p>
             <h2 className="display text-[clamp(2.6rem,5.2vw,5rem)]">
-              A studio,
-              <br />
-              <em className="font-light">not</em> a waiting room.
+              <ScrollWords text="A studio, not a waiting room." />
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
@@ -86,74 +85,94 @@ const HOW_ARCH: Curve = [
   [520, 250],
 ]
 const STEP_LINE = ['In your own words', 'Only what matters', 'The right visit', 'A real free chair', 'Confirmed']
+const MESSAGE = 'hi 👋 one tooth hurts. can I come in this week?'
 
+/**
+ * Scroll-driven: the section pins, the patient's message types itself, then
+ * each stretch of scroll advances the arch one step until ORA replies with a
+ * confirmed visit.
+ */
 function HowItBegins() {
   const reduce = useReducedMotion()
-  const [step, setStep] = useState(0)
-  const [auto, setAuto] = useState(true)
-  const ref = useRef<HTMLDivElement>(null)
-  const [inView, setInView] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.4 })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-  useEffect(() => {
-    if (!auto || !inView || reduce) return
-    const t = window.setInterval(() => setStep((s) => (s + 1) % 5), 1700)
-    return () => window.clearInterval(t)
-  }, [auto, inView, reduce])
+  const ref = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
+  const [step, setStep] = useState(reduce ? 4 : 0)
+  const [typed, setTyped] = useState(reduce ? MESSAGE.length : 0)
+  const [done, setDone] = useState(!!reduce)
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    if (reduce) return
+    setTyped(Math.round(Math.min(1, v / 0.14) * MESSAGE.length))
+    setStep(Math.min(4, Math.max(0, Math.floor((v - 0.16) / 0.15))))
+    setDone(v > 0.84)
+  })
+  const rail = useTransform(scrollYProgress, [0.14, 0.9], [0, 1])
+  const chars = [...MESSAGE]
 
   return (
-    <section id="visit" className="scroll-mt-28 bg-ivory px-4 py-24 md:px-[5%] md:py-36">
-      <Reveal className="mb-16 md:mb-20">
-        <p className="label mb-5">02 — Visit</p>
-        <h2 className="display max-w-[860px] text-[clamp(2.6rem,5.2vw,5rem)]">One message in. One visit out.</h2>
-      </Reveal>
-      <div ref={ref} className="grid items-center gap-14 lg:grid-cols-[0.8fr_1.2fr]">
-        <Reveal>
-          <div className="relative max-w-[380px]">
-            <p className="label mb-4 text-[10px]">09:02 · WhatsApp</p>
-            <p className="rounded-[22px] rounded-bl-md bg-porcelain px-6 py-5 font-mono text-[15px] leading-relaxed shadow-[0_20px_40px_-28px_rgba(0,0,0,0.4)]">
-              hi 👋 one tooth hurts.
-              <br />
-              can I come in this week?
-            </p>
-            <p className="mt-6 text-sm text-muted">Usually that starts hours of back-and-forth. At ORA it starts here →</p>
+    <section ref={ref} id="visit" className="relative bg-ivory" style={{ height: reduce ? 'auto' : '460vh' }}>
+      <div className={`${reduce ? 'py-24' : 'sticky top-0 h-[100svh]'} flex flex-col justify-center overflow-hidden px-4 pt-16 md:px-[5%] md:pt-20`}>
+        <div className="mb-6 flex items-end justify-between gap-6 md:mb-10">
+          <div>
+            <p className="label mb-3">02 — Visit</p>
+            <h2 className="display max-w-[860px] text-[clamp(2.2rem,5vw,4.8rem)]">One message in. One visit out.</h2>
           </div>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <div onMouseEnter={() => setAuto(false)} className="relative">
+          <p className="label hidden text-right md:block">Scroll ↓</p>
+        </div>
+
+        <div className="grid items-center gap-6 md:gap-14 lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="max-w-[400px] space-y-3 lg:max-w-[480px]">
+            <p className="label text-[10px]">09:02 · WhatsApp</p>
+            <p className="min-h-[88px] rounded-[22px] rounded-bl-md bg-porcelain px-5 py-4 font-mono text-[14px] leading-relaxed shadow-[0_20px_40px_-28px_rgba(0,0,0,0.4)] md:px-6 md:py-5 md:text-[15px] lg:text-[17px]">
+              {chars.slice(0, typed).join('')}
+              {typed < chars.length && <span className="ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 animate-pulse bg-charcoal" />}
+            </p>
+            <AnimatePresence>
+              {done && (
+                <motion.p
+                  initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+                  className="ml-auto max-w-[330px] rounded-[22px] rounded-br-md bg-charcoal px-5 py-4 text-[14px] leading-relaxed text-ivory md:text-[15px] lg:max-w-[380px] lg:text-[16px]"
+                >
+                  <span className="label mb-1 block text-[9.5px] !text-clinic-soft">ORA · 09:05</span>
+                  You’re booked — Comfort &amp; Assessment Visit, Thu 10:30, Chair 02. Your CarePass is ready.
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div className="relative mx-auto w-full max-w-[640px] lg:max-w-[760px]">
             <svg viewBox="0 0 600 290" className="w-full" aria-hidden>
-              <OcclusionArch step={step} curve={HOW_ARCH} labelSize={26} labels={false} />
+              <OcclusionArch step={done ? 5 : step} curve={HOW_ARCH} labelSize={26} labels={false} />
             </svg>
-            <div className="absolute inset-x-0 bottom-[6%] text-center" aria-live="polite">
+            <div className="absolute inset-x-0 bottom-[4%] text-center" aria-live="polite">
               <AnimatePresence mode="wait">
-                <motion.div key={step} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
+                <motion.div key={step} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
                   <p className="label text-[10px]">
                     0{step + 1} · {STEPS[step]}
                   </p>
-                  <p className="mt-1 font-display text-[clamp(1.6rem,3vw,2.4rem)]">{STEP_LINE[step]}</p>
+                  <p className="mt-1 font-display text-[clamp(1.5rem,3vw,2.4rem)]">{STEP_LINE[step]}</p>
                 </motion.div>
               </AnimatePresence>
             </div>
           </div>
-          <div className="mt-8 flex justify-center gap-2" role="tablist" aria-label="Booking steps">
-            {STEPS.map((s, i) => (
-              <button
-                key={s}
-                role="tab"
-                aria-selected={step === i}
-                aria-label={s}
-                onClick={() => (setAuto(false), setStep(i))}
-                className={`h-[3px] w-8 transition-colors ${step === i ? 'bg-clinic' : 'bg-steel-2 hover:bg-steel'}`}
-              />
-            ))}
+        </div>
+
+        {!reduce && (
+          <div className="mt-8 md:mt-12">
+            <div className="h-px w-full bg-steel-2">
+              <motion.div className="h-px origin-left bg-clinic" style={{ scaleX: rail }} />
+            </div>
+            <div className="mt-2 flex justify-between">
+              {STEPS.map((s, i) => (
+                <span key={s} className={`label text-[9px] transition-colors ${i <= step && typed === chars.length ? 'text-charcoal' : 'text-steel'}`}>
+                  {s}
+                </span>
+              ))}
+            </div>
           </div>
-        </Reveal>
+        )}
       </div>
     </section>
   )
@@ -181,15 +200,16 @@ function Smile() {
           style={{ y, top: '-8%', filter: WARM_GRADE, objectPosition: '32% 30%' }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-charcoal/55 via-charcoal/10 to-transparent" />
-        <div className="relative z-10 flex h-full flex-col justify-end px-4 pb-16 md:px-[5%] md:pb-24">
+        <div className="relative z-10 flex h-full flex-col justify-end px-4 pb-[170px] md:px-[5%] md:pb-[190px]">
           <Reveal>
             <p className="label mb-4 !text-ivory/80">03 — Smile</p>
             <h2 className="display max-w-[640px] text-[clamp(2.6rem,5.6vw,5.4rem)] text-ivory">Start with the conversation.</h2>
           </Reveal>
         </div>
       </div>
-      <div className="relative z-10 -mt-10 px-4 pb-24 md:px-[5%]">
-        <div className="mx-auto max-w-[900px] bg-porcelain px-4 pt-2 md:px-8">
+      {/* Shade tabs rise out of the photograph's lower edge, like teeth along a gum line. */}
+      <div className="relative z-10 -mt-[128px] px-4 pb-24 md:px-[5%]">
+        <div className="mx-auto max-w-[900px]">
           <SmileGoal
             onChange={(g) => {
               reset()
@@ -217,7 +237,9 @@ function CareDoors() {
       <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
         <Reveal>
           <p className="label mb-5">04 — Care</p>
-          <h2 className="display text-[clamp(2.4rem,4.6vw,4.2rem)]">Nine ways to begin.</h2>
+          <h2 className="display text-[clamp(2.4rem,4.6vw,4.2rem)]">
+            <ScrollWords text="Nine ways to begin." />
+          </h2>
         </Reveal>
         <Link to="/care" className="btn-quiet">
           All care →
