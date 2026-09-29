@@ -1,7 +1,6 @@
-import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
+import { animate, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { CLINIC } from '../../data/clinic'
 import { useUi } from '../../store/uiStore'
 import { useVisit } from '../../store/visitStore'
 import { WARM_GRADE, imageSet, imageSrc } from './EditorialImage'
@@ -42,7 +41,6 @@ export default function SmileApertureHero() {
   const resetVisit = useVisit((s) => s.reset)
   const section = useRef<HTMLElement>(null)
   const [opening, setOpening] = useState(false)
-  const [reading, setReading] = useState('0.00')
 
   // Aperture: entrance → scroll → begin.
   const base = useMotionValue(reduce ? REST : 0)
@@ -55,7 +53,6 @@ export default function SmileApertureHero() {
   const low = useTransform(open, lowerPath)
   const upEdge = useTransform(open, upperEdge)
   const lowEdge = useTransform(open, lowerEdge)
-  useMotionValueEvent(open, 'change', (v) => setReading(Math.min(v, 1).toFixed(2)))
 
   useEffect(() => {
     if (!introDone || reduce) return
@@ -168,13 +165,6 @@ export default function SmileApertureHero() {
           </motion.p>
         </div>
 
-        {/* Instrument readouts at the aperture edges */}
-        <motion.p className="label pointer-events-none absolute left-[5%] top-[50%] hidden bg-porcelain/85 px-2 py-1 text-[9.5px] backdrop-blur md:block" {...fade(1.5)} aria-hidden>
-          Aperture {reading}
-        </motion.p>
-        <motion.p className="label pointer-events-none absolute right-[5%] top-[50%] hidden bg-porcelain/85 px-2 py-1 text-[9.5px] backdrop-blur md:block" {...fade(1.6)} aria-hidden>
-          Chair 03 · {CLINIC.coordinates}
-        </motion.p>
 
         {/* Lower form: the action */}
         <motion.div

@@ -140,7 +140,7 @@ export default function ChairFlow({ typeSlug, preference, onPreference, selected
       ) : bands.length === 0 ? (
         <div className="border-y border-bone py-10">
           <p className="font-display text-2xl">No {PREFERENCES.find((p) => p.id === preference)?.label.toLowerCase()} free in the next two weeks.</p>
-          <p className="mt-2 text-muted">Try another preference, or call the studio and we'll look for you.</p>
+          <p className="mt-2 text-muted">Try another preference, or call the clinic and we'll look for you.</p>
         </div>
       ) : (
         <ol className="border-t border-bone" aria-label="Best available times">
@@ -301,7 +301,7 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry: () 
       <p className="label mb-3 text-alert">Schedule unavailable</p>
       <p className="font-display text-2xl">{message}</p>
       <p className="mt-2 max-w-[520px] text-muted">
-        Nothing has been booked. You can try again, or call the studio on {CLINIC.phone} and we'll find a time with you.
+        Nothing has been booked. You can try again, or call the clinic on {CLINIC.phone} and we'll find a time with you.
       </p>
       <button className="btn-primary mt-6" onClick={onRetry}>
         Try again

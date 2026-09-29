@@ -94,7 +94,7 @@ export default function CarePass({
             ['Time', `${formatIsoTime(appointment.start_at)} — ${formatIsoTime(appointment.end_at)}`, ''],
             ['With', clinician.name, ''],
             ['Chair', chair.name, ''],
-            ['Studio', `${CLINIC.address[0]}, ${CLINIC.address[1]}`, 'col-span-2'],
+            ['Location', `${CLINIC.address[0]}, ${CLINIC.address[1]}`, 'col-span-2'],
           ].map(([k, v, span]) => (
             <div key={k} className={`border-b border-bone py-3 ${span}`}>
               <dt className="label text-[9.5px]">{k}</dt>

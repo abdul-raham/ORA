@@ -55,7 +55,7 @@ export function canPlace(snap: Snapshot, p: PlacementInput): PlacementResult {
   const day = weekday(date)
 
   const clinic = CLINIC.hours[day]
-  if (!clinic || startMin < clinic[0] || endMin > clinic[1]) return { ok: false, reason: 'Outside studio hours' }
+  if (!clinic || startMin < clinic[0] || endMin > clinic[1]) return { ok: false, reason: 'Outside opening hours' }
   const own = clinician.hours[day]
   if (!own || startMin < own[0] || endMin > own[1]) return { ok: false, reason: `${clinician.name} isn't working then` }
 

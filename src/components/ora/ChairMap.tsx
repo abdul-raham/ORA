@@ -174,7 +174,7 @@ export default function ChairMap({
               <div key={c.id} className="absolute inset-x-0 border-b border-bone" style={{ top: i * LANE_H, height: LANE_H }} aria-hidden />
             ))}
             {closedDay && (
-              <p className="absolute inset-0 grid place-items-center font-display text-3xl text-muted">Studio closed</p>
+              <p className="absolute inset-0 grid place-items-center font-display text-3xl text-muted">Clinic closed</p>
             )}
 
             {/* Drop target preview */}

@@ -26,7 +26,7 @@ export default function ClinicPulse({ date, view, exceptions }: { date: string; 
   const open = isToday && hours && now.minutes >= hours[0] && now.minutes < hours[1]
 
   let sentence: React.ReactNode
-  if (!hours) sentence = <>The studio is closed {isToday ? 'today' : `on ${formatDay(date, 'long')}`}. Nothing is booked.</>
+  if (!hours) sentence = <>The clinic is closed {isToday ? 'today' : `on ${formatDay(date, 'long')}`}. Nothing is booked.</>
   else if (!isToday)
     sentence = (
       <>
@@ -46,7 +46,7 @@ export default function ClinicPulse({ date, view, exceptions }: { date: string; 
         ) : (
           <>, no more arrivals today</>
         )}
-        . {late.length ? <>Running <N>{late.length} late</N>.</> : open ? <>Running on time.</> : <>Studio {now.minutes < hours[0] ? 'opens' : 'closed'} at {formatTime(now.minutes < hours[0] ? hours[0] : hours[1])}.</>}
+        . {late.length ? <>Running <N>{late.length} late</N>.</> : open ? <>Running on time.</> : <>{now.minutes < hours[0] ? 'Opens' : 'Closed'} at {formatTime(now.minutes < hours[0] ? hours[0] : hours[1])}.</>}
       </>
     )
 

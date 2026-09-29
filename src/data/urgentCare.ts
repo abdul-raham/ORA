@@ -28,7 +28,7 @@ export const URGENT_GUIDANCE: Record<UrgencyTier, { title: string; lead: string;
     steps: [
       'Call 112 or go to the nearest hospital emergency department now.',
       'If you can, bring a list of any medicines you take.',
-      'Once you are safe, call the studio and we will arrange follow-up care with you.',
+      'Once you are safe, call the clinic and we will arrange follow-up care with you.',
     ],
   },
   'same-day': {

@@ -46,12 +46,12 @@ function Studio() {
   return (
     <section ref={ref} id="studio" className="scroll-mt-28 px-4 py-24 md:px-[5%] md:py-36">
       <div className="grid items-end gap-10 lg:grid-cols-12">
-        <EditorialImage k="treatmentChair" className="aspect-[4/3] lg:col-span-7" sizes="(min-width:1024px) 58vw, 100vw" caption="Chair 02 · treatment room" />
+        <EditorialImage k="treatmentChair" className="aspect-[4/3] lg:col-span-7" sizes="(min-width:1024px) 58vw, 100vw" caption="Treatment room · Chair 02" />
         <div className="lg:col-span-5 lg:pb-6">
           <Reveal>
-            <p className="label mb-5">01 — Studio</p>
+            <p className="label mb-5">01 — The practice</p>
             <h2 className="display text-[clamp(2.6rem,5.2vw,5rem)]">
-              <ScrollWords text="A studio, not a waiting room." />
+              <ScrollWords text="Private care, not a waiting room." />
             </h2>
           </Reveal>
           <Reveal delay={0.1}>

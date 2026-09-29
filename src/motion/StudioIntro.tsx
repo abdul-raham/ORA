@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { CLINIC } from '../data/clinic'
 import { useUi } from '../store/uiStore'
 
 // First-visit entrance. The mark resolves over a dental arch, then the screen
@@ -115,9 +114,6 @@ export default function StudioIntro() {
                 transition={{ delay: 0.8, duration: 0.9 }}
               >
                 Dental Studio · Victoria Island, Lagos
-              </motion.p>
-              <motion.p className="label mt-2 text-[9.5px] text-steel" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}>
-                {CLINIC.coordinates}
               </motion.p>
             </div>
           </motion.div>

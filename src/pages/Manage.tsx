@@ -139,7 +139,7 @@ function ManageVisit({ code }: { code: string }) {
             onDone={(d) => {
               setDetail(d)
               setMode('view')
-              setFlash('Moved. Your CarePass, reminder and the studio schedule are updated.')
+              setFlash('Moved. Your CarePass, reminder and the clinic schedule are updated.')
               window.scrollTo({ top: 0, behavior: 'smooth' })
             }}
           />

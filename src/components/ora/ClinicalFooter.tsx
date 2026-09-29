@@ -15,7 +15,7 @@ export default function ClinicalFooter() {
           </Link>
         </div>
         <div>
-          <p className="label mb-4">Studio</p>
+          <p className="label mb-4">Visit us</p>
           <address className="not-italic leading-relaxed text-graphite">
             {CLINIC.address.map((l) => (
               <span key={l} className="block">
@@ -23,7 +23,6 @@ export default function ClinicalFooter() {
               </span>
             ))}
           </address>
-          <p className="label mt-4 text-[10px]">{CLINIC.coordinates}</p>
         </div>
         <div>
           <p className="label mb-4">Hours</p>

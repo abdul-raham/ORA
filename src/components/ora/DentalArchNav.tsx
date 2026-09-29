@@ -20,7 +20,7 @@ import { OcclusionArch } from './OcclusionPath'
 // On entering booking, the arch deepens into the OcclusionPath progress arch.
 
 const ITEMS = [
-  { label: 'STUDIO', to: '/#studio', t: 0.12 },
+  { label: 'ABOUT', to: '/#studio', t: 0.12 },
   { label: 'CARE', to: '/care', t: 0.37 },
   { label: 'SMILE', to: '/#smile', t: 0.63 },
   { label: 'VISIT', to: '/#visit', t: 0.88 },
@@ -208,7 +208,7 @@ function DesktopArch({ booking, settled, d, labelsOpacity, dot, hover, setHover,
       ) : (
         <div className="absolute right-[3.3%] top-[33%] flex -translate-y-1/2 items-center gap-6">
           <Link to="/staff" className="btn-quiet hidden lg:inline-flex" title="Staff sign-in">
-            Studio login
+            Staff login
           </Link>
           <Link to="/visit" className="btn-primary !py-3">
             Book <span aria-hidden>↗</span>
@@ -326,7 +326,7 @@ function MobileHeader({ booking }: { booking: boolean }) {
             style={{ borderBottomLeftRadius: '50% 18%', borderBottomRightRadius: '50% 18%' }}
           >
             <ul className="px-6">
-              {[{ label: 'Home', to: '/' }, ...ITEMS.map((i) => ({ label: i.label, to: i.to })), { label: 'Manage a visit', to: '/manage' }, { label: 'Studio login', to: '/staff' }].map(
+              {[{ label: 'Home', to: '/' }, ...ITEMS.map((i) => ({ label: i.label, to: i.to })), { label: 'Manage a visit', to: '/manage' }, { label: 'Staff login', to: '/staff' }].map(
                 (it, i, all) => {
                   // Items step along an arch: the middle of the list sits furthest out.
                   const offset = Math.sin((i / (all.length - 1)) * Math.PI) * 36
