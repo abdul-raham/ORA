@@ -270,7 +270,7 @@ function MobileHeader({ booking }: { booking: boolean }) {
 
   return (
     <div className="relative md:hidden">
-      <div className="flex h-16 items-center justify-between px-4">
+      <div className="relative z-10 flex h-16 items-center justify-between border-b border-bone/80 bg-porcelain/95 px-4 backdrop-blur">
         <Link to="/" className="font-display text-[26px] leading-none" aria-label="ORA Dental Studio — home">
           ORA<span className="text-clinic">°</span>
         </Link>
@@ -332,7 +332,7 @@ function MobileHeader({ booking }: { booking: boolean }) {
                   const offset = Math.sin((i / (all.length - 1)) * Math.PI) * 36
                   return (
                     <li key={it.to} style={{ paddingLeft: offset }} className="border-b border-bone">
-                      <Link to={it.to} className="flex items-baseline justify-between py-3.5">
+                      <Link to={it.to} onClick={() => setOpen(false)} className="flex items-baseline justify-between py-3.5">
                         <span className="display text-[34px] capitalize">{it.label.toLowerCase()}</span>
                         <span className="label">0{i + 1}</span>
                       </Link>

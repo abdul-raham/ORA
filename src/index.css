@@ -37,7 +37,8 @@
     background: var(--color-porcelain);
     font-family: var(--font-sans);
     font-feature-settings: 'ss01', 'cv11';
-    overflow-x: hidden;
+    /* clip, not hidden: hidden turns body into a scroll container and breaks sticky on phones */
+    overflow-x: clip;
   }
   ::selection {
     background: var(--color-clinic-soft);
