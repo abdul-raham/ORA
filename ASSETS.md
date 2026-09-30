@@ -1,7 +1,9 @@
 # Assets
 
 All photography is public-domain (CC0), downloaded and optimised locally to
-`public/images/` as WebP (full size + 480w). Nothing is hotlinked. A warm CSS
+`public/images/` as WebP. The hero, studio chair and both smile portraits come
+from the photographers' full-resolution originals (480w, 1280w, 1920w for the
+hero, and 2400w); the remaining images are 960–1024px previews (480w + full). Nothing is hotlinked. A warm CSS
 grade (`WARM_GRADE` in `src/components/ora/EditorialImage.tsx`) is applied at
 render time; the files themselves are unedited apart from resizing.
 
