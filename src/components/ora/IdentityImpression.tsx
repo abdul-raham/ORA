@@ -103,20 +103,35 @@ export default function IdentityImpression({
     }
     advance(2)
   }
-  const submitCode = (value: string) => {
-    if (!user) return
+  const submitCode = (value: string, who: StaffUser | null = user) => {
+    if (!who) return
     if (!checkCode(value)) return fail('That code didn’t match. Use the current code from your authenticator.')
     advance(3, () => {
-      startSession(user)
-      window.setTimeout(() => onSignedIn(user), reduce ? 60 : 1700)
+      startSession(who)
+      window.setTimeout(() => onSignedIn(who), reduce ? 60 : 1700)
     })
   }
 
+  // One tap for judges: runs every stage with the demo credentials so the
+  // studio can be seen waking layer by layer.
   const pickAccount = (u: StaffUser) => {
+    const pause = reduce ? 0 : 700
     setEmail(u.email)
-    setPassword(DEMO_PASSWORD)
+    setUser(u)
     setCode('')
-    submitIdentity(undefined, u.email)
+    advance(1, () => {
+      setPassword(DEMO_PASSWORD)
+      window.setTimeout(
+        () =>
+          advance(2, () =>
+            window.setTimeout(() => {
+              setCode(DEMO_CODE)
+              submitCode(DEMO_CODE, u)
+            }, pause),
+          ),
+        pause,
+      )
+    })
   }
 
   const p = stage + (scanning ? 0.5 : 0)
@@ -294,8 +309,11 @@ export default function IdentityImpression({
             transition={{ delay: reduce ? 0 : 0.9 }}
             className="relative z-10 w-full max-w-[560px] border-t border-bone pt-5"
           >
-            <p id="demo-access" className="label mb-3">
-              Demo access · passphrase <span className="text-charcoal">{DEMO_PASSWORD}</span> · code <span className="text-charcoal">{DEMO_CODE}</span>
+            <p id="demo-access" className="mb-1 font-display text-xl">
+              Just looking? Enter as a demo user.
+            </p>
+            <p className="label mb-3 text-[10px]">
+              One tap signs in · or type passphrase <span className="text-charcoal">{DEMO_PASSWORD}</span> and code <span className="text-charcoal">{DEMO_CODE}</span>
             </p>
             <ul className="grid gap-px bg-bone sm:grid-cols-3">
               {DEMO_ACCOUNTS.map((u) => (
