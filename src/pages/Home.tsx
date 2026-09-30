@@ -46,7 +46,7 @@ function Studio() {
   return (
     <section ref={ref} id="studio" className="scroll-mt-28 px-4 py-24 md:px-[5%] md:py-36">
       <div className="grid items-end gap-10 lg:grid-cols-12">
-        <EditorialImage k="treatmentChair" className="aspect-[4/3] lg:col-span-7" sizes="(min-width:1024px) 58vw, 100vw" caption="Treatment room · Chair 02" />
+        <EditorialImage k="chairDetail" className="aspect-[4/3] lg:col-span-7" sizes="(min-width:1024px) 58vw, 100vw" caption="Treatment room · Chair 02" />
         <div className="lg:col-span-5 lg:pb-6">
           <Reveal>
             <p className="label mb-5">01 — The practice</p>
@@ -71,7 +71,7 @@ function Studio() {
         </div>
       </div>
       <motion.div style={{ y: drift }} className="mt-10 grid grid-cols-2 gap-4 md:ml-[42%] md:mt-[-4rem] md:w-[58%]">
-        <EditorialImage k="chairDetail" className="aspect-[4/5]" sizes="30vw" />
+        <EditorialImage k="instrumentsArm" className="aspect-[4/5]" sizes="30vw" />
         <EditorialImage k="instrumentMacro" className="mt-12 aspect-[4/5]" sizes="30vw" position="40% 50%" />
       </motion.div>
     </section>

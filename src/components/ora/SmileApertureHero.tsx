@@ -96,15 +96,16 @@ export default function SmileApertureHero() {
   return (
     <section ref={section} onPointerMove={onMove} className="relative h-[100svh] min-h-[620px] overflow-hidden" aria-labelledby="hero-title">
       {/* The room */}
-      <motion.div className="absolute inset-[-3%]" style={{ x: photoX, y: photoY }}>
+      {/* Taller than the hero and lifted, so the chair sits inside the opening rather than below it. */}
+      <motion.div className="absolute inset-x-[-3%] bottom-[-3%] top-[-34%]" style={{ x: photoX, y: photoY }}>
         <motion.img
-          src={imageSrc('treatmentRoom')}
-          srcSet={imageSet('treatmentRoom')}
+          src={imageSrc('treatmentChair')}
+          srcSet={imageSet('treatmentChair')}
           sizes="100vw"
-          alt="A treatment chair at ORA, seen from above"
+          alt="A treatment chair in a bright, quiet room at ORA"
           fetchPriority="high"
-          className="size-full object-cover"
-          style={{ filter: WARM_GRADE, objectPosition: '50% 58%' }}
+          className="size-full object-cover object-[16%_58%] md:object-[34%_62%]"
+          style={{ filter: WARM_GRADE }}
           initial={reduce ? false : { scale: 1.2 }}
           animate={show ? { scale: 1.02 } : undefined}
           transition={{ duration: 2.4, ease: [0.22, 1, 0.36, 1] }}
